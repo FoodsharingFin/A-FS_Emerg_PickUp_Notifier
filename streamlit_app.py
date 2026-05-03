@@ -1,7 +1,10 @@
 import streamlit as st
 import datetime
 import time
+import pytz
 from config import TelegramPickupBot
+
+local_tz = pytz.timezone('Europe/Helsinki')
 
 # --- Page Config ---
 st.set_page_config(
@@ -52,7 +55,7 @@ st.session_state.setdefault('submitted', False)
 st.session_state.setdefault('showing_thank_you', False)
 st.session_state.setdefault('submission_success', False)
 st.session_state.setdefault('submission_error', None)
-st.session_state.setdefault('wait_minutes', 15)
+st.session_state.setdefault('wait_minutes', 60)
 
 # --- Navigation Functions ---
 def next_page(): st.session_state.page += 1
@@ -75,7 +78,7 @@ def process_submission():
 
         date_str = st.session_state.date
         if date_str == "Today":
-            date_str = datetime.datetime.now().strftime("%A, %d %B")
+            date_str = datetime.datetime.now(local_tz).strftime("%A, %d %B")
 
         result = pickup_bot.run_pickup_workflow(
             location=st.session_state.location or "Not specified",
@@ -99,7 +102,7 @@ st.markdown(f'<p style="text-align:right; font-size:0.8em;">Step {st.session_sta
 st.markdown('</div>', unsafe_allow_html=True)
 
 # --- Current Hour for Filtering ---
-current_hour = datetime.datetime.now().hour
+current_hour = datetime.datetime.now(local_tz).hour
 
 # === PAGE 1: DATE SELECTION ===
 if st.session_state.page == 1:
